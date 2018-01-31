@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Github Profile Finder</title>
+
+	<!-- Bootstrap files -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- Metadata -->
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="description" content="A small proyect of an Udemy course about fetching the user's data from Github."/>
+	<meta name="author" content="Oscar Ruben Germade-Gonzalez Rios"/>
+	<meta name="keywords" content="github profile"/>
+
+	<!-- FontAwsome Icons-->
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"/>
+
+	<!-- CSS style -->
+	<link rel="stylesheet" href="css/index.css"/>
+
+	<!-- Google Font Spectral+sc -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab|Spectral+SC" rel="stylesheet">
+</head>
+
+<!-- BODY -->
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-offset-3 col-sm-6">
+		    <h1 id="heading">Github Profile Finder</h1>
+				<span id="logo"><i class="fa fa-github fa-5x text-center" aria-hidden="true"></i></span>
+		    <form id="userForm">
+			    <div class="form-group">
+				    <label>Github Username:</label>
+				    <input type="text" id="username" class="form-control">
+			    </div>
+		    </form>
+			</div>
+		</div>
+
+		<!-- Where we display the users' profile -->
+		<div id="profile"></div>
+
+
+	</div>
+
+<!-- JS functions -->
+	<script>
+		function getProfile(e){
+			/* prevent default behaviour */
+			e.preventDefault();
+
+			/* getting the value of the username from the input text */
+			var username = document.getElementById("username").value;
+			if(!username || username == ""){
+				document.getElementById("profile").innerHTML = `<div class="alert alert-danger">
+            <p>"Please, insert a username"</p>
+				  </div>`; // error message
+			}
+
+			/* Creating an XMLHttpRequest object to retrieve data from a web server */
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() { // function to request data from a server and display it
+				if(xhttp.readyState == 4 && xhttp.status == 200) { // if response is ready and status is ok
+					var user = JSON.parse(xhttp.responseText); // where to display the data
+					document.getElementById('profile').innerHTML = `<div class="panel 		panel-default">
+  								<div class="panel-heading">
+    							  <h3 class="panel-title">${user.name}, <i class="fa fa-map-marker" aria-hidden="true"></i> ${user.location}</h3>
+  								</div>
+  								<div class="panel-body">
+    								<div class="row">
+    								  <div class="col-sm-3">
+    								   <img src="${user.avatar_url}">
+    								  </div>
+    								  <div class="col-md-9">
+    									  <span class="label label-primary">Public Repos ${user.public_repos}</span>
+    									  <span class="label label-danger">Public Gists ${user.public_gists}</span>
+												<span class="label label-default">Followers ${user.followers}</span>
+												<span class="label label-default">Following ${user.following}</span>
+    									  <br><br>
+    									  <ul class="list-group">
+												  <li class="list-group-item">Hireable: ${user.hireable}</li>
+    										  <li class="list-group-item">Website: ${user.blog}</li>
+    										  <li class="list-group-item">Email: ${user.email}</li>
+													<li class="list-group-item">Member since: ${user.created_at}</li>
+													<li class="list-group-item">Last update: ${user.updated_at}</li>
+    									  </ul>
+    								  	<a class="btn btn-default text-center" target="_blank" href="${user.html_url}">Visit Github</a>
+    								  </div>
+    								</div>
+  								</div>
+							  </div>`;
+
+					/* displying error message if user does not exist */
+					if(user.name === null) {
+						document.getElementById("profile").innerHTML = `<div class="alert alert-danger">
+					    <p>"Sorry, this user you have typed does not exist."</p>
+						</div>`;
+					}
+				}
+			}
+			xhttp.open("GET", "https://api.github.com/users/" + username, true);
+			xhttp.send();
+		}
+
+		document.getElementById("userForm").addEventListener("submit", getProfile, false);
+	</script>
+</body>
+</html>
